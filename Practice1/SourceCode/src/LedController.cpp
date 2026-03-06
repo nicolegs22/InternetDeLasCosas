@@ -28,5 +28,9 @@ void LedController::actualizar(float distancia) {
         digitalWrite(redPin, LOW);
         digitalWrite(bluePin, LOW);
         digitalWrite(greenPin, HIGH);
+    } else {
+        digitalWrite(redPin, LOW);
+        digitalWrite(bluePin, LOW);
+        digitalWrite(greenPin, LOW);
     }
 }
