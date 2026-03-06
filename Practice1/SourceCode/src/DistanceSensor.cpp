@@ -1,4 +1,5 @@
-#include "DistanceSensor.h"
+#include "../include/DistanceSensor.h"    // header is one level up in include/
+
 
 DistanceSensor::DistanceSensor(int trig, int echo, float speed, unsigned long time) {
     trigPin = trig;

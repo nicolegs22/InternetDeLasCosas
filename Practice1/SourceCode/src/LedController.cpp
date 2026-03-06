@@ -1,4 +1,4 @@
-#include "LedController.h"
+#include "../include/LedController.h"
 
 LedController::LedController(int red, int blue, int green) {
     redPin = red;

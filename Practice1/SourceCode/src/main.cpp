@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include "DistanceSensor.h"
-#include "LedController.h"
+#include "include/DistanceSensor.h"
+#include "include/LedController.h"
 
 const int TRIG_PIN = 5;
 const int ECHO_PIN = 18;
@@ -26,6 +26,6 @@ void loop() {
     float distancia = sensor.medirDistancia();
 
     leds.actualizar(distancia);
-
+    
     delay(500);
 }
