@@ -1,4 +1,4 @@
-#include "LedController.h"
+#include "../include/LedController.h"
 
 LedController::LedController(int red, int blue, int green) {
     redPin = red;
@@ -28,5 +28,9 @@ void LedController::actualizar(float distancia) {
         digitalWrite(redPin, LOW);
         digitalWrite(bluePin, LOW);
         digitalWrite(greenPin, HIGH);
+    } else {
+        digitalWrite(redPin, LOW);
+        digitalWrite(bluePin, LOW);
+        digitalWrite(greenPin, LOW);
     }
 }
