@@ -12,19 +12,19 @@ void LedController::begin() {
     pinMode(greenPin, OUTPUT);
 }
 
-void LedController::actualizar(float distancia) {
+void LedController::update(float distance) {
 
     if(distancia < 10) {
         digitalWrite(redPin, HIGH);
         digitalWrite(bluePin, LOW);
         digitalWrite(greenPin, LOW);
 
-    } else if(distancia >= 10 && distancia < 20) {
+    } else if(distance >= 10 && distance < 20) {
         digitalWrite(redPin, LOW);
         digitalWrite(bluePin, HIGH);
         digitalWrite(greenPin, LOW);
 
-    } else if(distancia >= 20 && distancia < 30) {
+    } else if(distance >= 20 && distance < 30) {
         digitalWrite(redPin, LOW);
         digitalWrite(bluePin, LOW);
         digitalWrite(greenPin, HIGH);

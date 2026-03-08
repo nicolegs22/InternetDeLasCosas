@@ -12,7 +12,7 @@ private:
 public:
     LedController(int red, int blue, int green);
     void begin();
-    void actualizar(float distancia);
+    void update(float distance);
 };
 
 #endif
