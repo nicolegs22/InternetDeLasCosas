@@ -30,7 +30,7 @@ Distance Sensor
         begin(): Configura los pines del sensor para su correcto funcionamiento en el microcontrolador.
             Proceso:
             Se encarga de inicializar la configuración de los pines del sensor ultrasónico en el microcontrolador. Para ello se utiliza la función pinMode() de la librería de Arduino, configurando el pin trigPin como salida (OUTPUT), ya que es el encargado de enviar el pulso ultrasónico, y el pin echoPin como entrada (INPUT), ya que recibe la señal reflejada cuando el sonido rebota en un objeto. Esta configuración es necesaria para que el sensor pueda emitir y recibir correctamente las señales utilizadas para medir la distancia.
-        medirDistancia(): Realiza la medición de la distancia calculando el tiempo que tarda el pulso ultrasónico en regresar al sensor.
+        measureDistance(): Realiza la medición de la distancia calculando el tiempo que tarda el pulso ultrasónico en regresar al sensor.
             Proceso:
             Realiza el proceso de medición de distancia mediante el sensor ultrasónico. Primero se envía un pulso corto desde el pin trigPin utilizando digitalWrite() y delayMicroseconds(), lo que genera la onda ultrasónica. Luego, mediante la función pulseIn(), se mide el tiempo que tarda la señal reflejada en llegar al pin echoPin. Este tiempo se almacena en la variable duracion. Finalmente, la distancia se calcula multiplicando la duración del pulso por la velocidad del sonido (soundSpeed) y dividiendo el resultado entre dos, ya que la señal realiza un recorrido de ida y vuelta entre el sensor y el objeto. El valor calculado se devuelve como resultado de la función.
 
@@ -53,7 +53,22 @@ Clase: LedController
         update(float distance)Controla el encendido de los LEDs según la distance detectada por el sensor.
         Proceso:
             Este método recibe como parámetro la distance medida por el sensor ultrasónico y, a partir de ese valor, determina qué LED debe encenderse. Se utilizan estructuras condicionales if y else if para comparar la distance con distintos rangos definidos en el programa. Si la distance es menor a 10 cm, se enciende el LED rojo indicando que el objeto está muy cerca. Si la distance está entre 10 y 20 cm, se activa el LED azul, representando una distance intermedia. Si la distance está entre 20 y 30 cm, se enciende el LED verde, indicando que el objeto está más alejado. En caso de que la distance sea mayor o igual a 30 cm, todos los LEDs permanecen apagados. El control del encendido y apagado de los LEDs se realiza mediante la función digitalWrite().
+Main
+Objetos utilizados:
+    -DistanceSensor sensor: Objeto encargado de gestionar el sensor ultrasónico y realizar la medición de la distancia entre el sensor y un objeto cercano.
 
+    -LedController leds: Objeto responsable de controlar los LEDs del sistema, encendiendo el color correspondiente según la distancia detectada.
+Funciones:
+
+    setup(): Inicializa los componentes del sistema.
+
+    Proceso:
+        Esta función se ejecuta una sola vez al iniciar el microcontrolador. En ella se llama al método sensor.begin(), que configura los pines del sensor ultrasónico para su correcto funcionamiento, y al método leds.begin(), que configura los pines de los LEDs como salidas. De esta manera, todos los dispositivos quedan preparados para comenzar a operar.
+
+    loop(): Ejecuta continuamente la lógica principal del sistema.
+
+    Proceso:
+        Esta función se ejecuta de manera repetitiva mientras el microcontrolador está encendido. En cada ciclo se obtiene la distancia detectada mediante sensor.measureDistance(), cuyo valor se guarda en la variable distance. Posteriormente, ese valor se envía al método leds.update(distance), que decide qué LED debe encenderse según el rango de distancia detectado. Finalmente, se utiliza delay(500) para realizar una pausa de medio segundo antes de repetir el proceso, permitiendo que las mediciones y la actualización de los LEDs se realicen de forma periódica.
 5 Resultados
 
 Los resultados obtenidos durante la implementación del proyecto demostraron que el sistema es capaz de medir la distancia de un objeto utilizando un sensor ultrasónico y representar dicha información mediante indicadores luminosos (LEDs). Durante las pruebas, el sensor logró detectar variaciones de distancia y enviar los datos al microcontrolador, el cual procesó la información y activó el LED correspondiente según el rango programado. Cuando la distancia medida fue menor a 10 cm, el sistema encendió el LED rojo, indicando una proximidad muy cercana; para distancias entre 10 cm y 20 cm se activó el LED azul, representando una distancia intermedia; y para distancias entre 20 cm y 30 cm se encendió el LED verde, indicando que el objeto se encuentra a una distancia mayor. Cuando la distancia superó los 30 cm, ninguno de los LEDs se activó, señalando que no existe una proximidad relevante. Además, el sistema mostró un funcionamiento estable con un intervalo de actualización aproximado de 500 milisegundos, permitiendo una respuesta visual rápida ante cambios de distancia. Estos resultados evidencian que el programa cumple correctamente con el objetivo de integrar la medición de distancia con un sistema de señalización visual simple y eficiente mediante programación modular en un entorno de desarrollo basado en Arduino.
