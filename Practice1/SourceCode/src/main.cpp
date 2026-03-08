@@ -18,7 +18,7 @@ void setup() {
 }
 
 void loop() {
-    float distance = sensor.medirDistancia();
+    float distance = sensor.measureDistance();
     leds.update(distance);
     delay(500);
 }

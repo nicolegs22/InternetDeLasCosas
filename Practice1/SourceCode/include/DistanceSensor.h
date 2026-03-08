@@ -13,7 +13,7 @@ private:
 public:
     DistanceSensor(int trig, int echo, float speed, unsigned long time);
     void begin();
-    float medirDistancia();
+    float measureDistance();
 };
 
 #endif
