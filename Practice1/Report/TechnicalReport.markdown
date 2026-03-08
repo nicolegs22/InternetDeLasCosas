@@ -1,3 +1,9 @@
+Informe Tecnico
+Integrantes:
+    Gabriel Herrera
+    Nicole Gomez
+    Fernando Rodriguez
+
 1 Requerimientos Funcionales:
 
 El circuito construido para este proyecto ha sido hecho en una placa de desarrollo Wemos R1 32 con un microcontrolador ESP 32, junto a ello como actuadores se utilizaron 3 LED’s, estos representando la distancia medida desde el sensor, este ultimo siendo un sensor ultrasónico el cual esta conectado a la placa principal, otras conexiones fueron hechas en una placa de pruebas.
