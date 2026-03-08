@@ -1,3 +1,22 @@
+Requerimientos Funcionales:
+
+El circuito construido para este proyecto ha sido hecho en una placa de desarrollo Wemos R1 32 con un microcontrolador ESP 32, junto a ello como actuadores se utilizaron 3 LED’s, estos representando la distancia medida desde el sensor, este ultimo siendo un sensor ultrasónico el cual esta conectado a la placa principal, otras conexiones fueron hechas en una placa de pruebas.
+Sus rangos de funcionamientos son los siguientes:
+
+Rango	Unidades
+
+ROJO ENCENDIDO	X < 10 cm
+BLUE ENCENDIDO	10 cm < X < 20 cm
+GREEN ENCENDIDO	20 cm < X < 30 cm
+TODOS APAGADOS	Cualquier otro valor
+ 
+Estos valores fueron dados según las pruebas hechas con el sensor, estos basados principalmente en como el ultrasónico reacciona a la interferencia por un objeto extraño o por una gran distancia, todos estos datos se recolectaron por medio de un código aparte del principal, y además se utilizo en ambos casos la siguiente ecuación:
+Distancia=  (velocidad del sonido*Tiempo de viaje de la señal)/2
+Requerimientos no funcionales:
+	El sistema construido puede ser implementado a otros proyectos
+	El código es legible, modular y documentado.
+	El sistema permite realizar cambios y desarrollar nuevas funciones sin perjudicar a las anteriores.
+
 Resultados
 
 Los resultados obtenidos durante la implementación del proyecto demostraron que el sistema es capaz de medir la distancia de un objeto utilizando un sensor ultrasónico y representar dicha información mediante indicadores luminosos (LEDs). Durante las pruebas, el sensor logró detectar variaciones de distancia y enviar los datos al microcontrolador, el cual procesó la información y activó el LED correspondiente según el rango programado. Cuando la distancia medida fue menor a 10 cm, el sistema encendió el LED rojo, indicando una proximidad muy cercana; para distancias entre 10 cm y 20 cm se activó el LED azul, representando una distancia intermedia; y para distancias entre 20 cm y 30 cm se encendió el LED verde, indicando que el objeto se encuentra a una distancia mayor. Cuando la distancia superó los 30 cm, ninguno de los LEDs se activó, señalando que no existe una proximidad relevante. Además, el sistema mostró un funcionamiento estable con un intervalo de actualización aproximado de 500 milisegundos, permitiendo una respuesta visual rápida ante cambios de distancia. Estos resultados evidencian que el programa cumple correctamente con el objetivo de integrar la medición de distancia con un sistema de señalización visual simple y eficiente mediante programación modular en un entorno de desarrollo basado en Arduino.
