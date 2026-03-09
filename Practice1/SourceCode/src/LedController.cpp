@@ -14,7 +14,7 @@ void LedController::begin() {
 
 void LedController::update(float distance) {
 
-    if(distancia < 10) {
+    if(distance < 10) {
         digitalWrite(redPin, HIGH);
         digitalWrite(bluePin, LOW);
         digitalWrite(greenPin, LOW);
