@@ -13,12 +13,16 @@ DistanceSensor sensor(TRIG_PIN, ECHO_PIN, SOUND_SPEED, TIMEOUT);
 LedController leds(ledPinRed, ledPinBlue, ledPinGreen);
 
 void setup() {
+    Serial.begin(115200);
     sensor.begin();
     leds.begin();
 }
 
 void loop() {
     float distance = sensor.measureDistance();
+    Serial.print("Distance Measured:");
+    Serial.print(distance);
+    Serial.println(" cm");
     leds.update(distance);
     delay(500);
 }
