@@ -1,4 +1,5 @@
-#include "DistanceSensor.h"
+#include "../include/DistanceSensor.h"    
+
 
 DistanceSensor::DistanceSensor(int trig, int echo, float speed, unsigned long time) {
     trigPin = trig;
@@ -12,7 +13,7 @@ void DistanceSensor::begin() {
     pinMode(echoPin, INPUT);
 }
 
-float DistanceSensor::medirDistancia() {
+float DistanceSensor::measureDistance() {
 
     digitalWrite(trigPin, LOW);
     delayMicroseconds(2);
@@ -22,9 +23,9 @@ float DistanceSensor::medirDistancia() {
 
     digitalWrite(trigPin, LOW);
 
-    unsigned long duracion = pulseIn(echoPin, HIGH, timeout);
+    unsigned long duration = pulseIn(echoPin, HIGH, timeout);
 
-    float distancia = duracion * soundSpeed / 2.0;
+    float distance = duration * soundSpeed / 2.0;
 
-    return distancia;
+    return distance;
 }
