@@ -6,7 +6,7 @@ from client_manager import GestorClientes
 from protocol import Protocolo
 
 class ServidorIoT:
-    def _init_(self, host='0.0.0.0', puerto=5000):
+    def __init__(self, host='0.0.0.0', puerto=5000):
         self.host = host
         self.puerto = puerto
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
