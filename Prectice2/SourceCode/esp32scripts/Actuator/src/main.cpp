@@ -1,9 +1,9 @@
 #include "actuator.h"
 
 Actuator actuator(
-    "CATOLAB",
-    "sistemas2024",
-    "192.168.1.100",
+    "LIZ SAAVEDRA 5G",
+    "melina5186804",
+    "192.168.0.7",
     5000,
     13, 12, 14
 );
