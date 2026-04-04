@@ -3,7 +3,7 @@
 Sensor sensor(
     "LIZ SAAVEDRA 5G",
     "melina5186804",
-    "192.168.1.100",
+    "192.168.0.13",
     5000,
     5,   // trig
     18   // echo

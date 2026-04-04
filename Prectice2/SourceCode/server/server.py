@@ -1,4 +1,3 @@
-
 import socket
 import threading
 import json
@@ -15,7 +14,8 @@ class ServidorIoT:
     def iniciar(self):
         self.server.bind((self.host, self.puerto))
         self.server.listen(5)
-        print(f"Servidor en {self.host}:{self.puerto}")
+        print(f"Servidor IoT iniciado en {self.host}:{self.puerto}")
+        print("-" * 50)
 
         while True:
             cliente_socket, direccion = self.server.accept()
@@ -36,50 +36,57 @@ class ServidorIoT:
                 buffer += datos
                 while "\n" in buffer:
                     linea, buffer = buffer.split("\n", 1)
-                    self.procesar_mensaje(linea, socket_cliente, direccion)
+                    self.procesar_mensaje(linea, socket_cliente)
+        except:
+            pass
         finally:
             self.gestor.eliminar(socket_cliente)
             socket_cliente.close()
 
-    def procesar_mensaje(self, data, socket_cliente, direccion):
+    def procesar_mensaje(self, data, socket_cliente):
         try:
             mensaje = json.loads(data)
         except:
             return
 
         tipo = mensaje.get("tipo")
-        id = mensaje.get("id")
 
         if tipo == "registro":
             self.gestor.registrar(
-                id,
+                mensaje.get("id"),
                 socket_cliente,
-                direccion,
+                None,
                 mensaje.get("dispositivo_tipo")
             )
 
         elif tipo == "sensor_data":
             distancia = mensaje.get("distancia")
-            print(f"[SENSOR] {id}: {distancia} cm")
-
-            comando = self.evaluar_distancia(distancia)
+            
+            if distancia < 10:
+                color = "ROJO"
+                rgb = [255, 0, 0]
+                duracion = 1000
+            elif 10 <= distancia <= 20:
+                color = "AZUL"
+                rgb = [0, 0, 255]
+                duracion = 500
+            elif 20 <= distancia <= 30:
+                color = "VERDE"
+                rgb = [0, 255, 0]
+                duracion = 200
+            else:
+                color = "APAGADO"
+                rgb = [0, 0, 0]
+                duracion = 100
+            
+            print(f"{color:8} | {distancia:5.1f} cm")
+            
+            comando = Protocolo.comando_led(rgb, duracion)
             self.enviar_a_actuadores(comando)
-
-        elif tipo == "comando_respuesta":
-            print(f"[ACTUADOR OK] {id}: {mensaje.get('comando')}")
-
-    def evaluar_distancia(self, d):
-        if d < 50:
-            return Protocolo.comando_led("rojo", 1000)
-        elif d < 100:
-            return Protocolo.comando_led("amarillo", 500)
-        else:
-            return Protocolo.comando_led("verde", 200)
 
     def enviar_a_actuadores(self, comando):
         for cliente in self.gestor.obtener_actuadores():
             try:
                 cliente.socket.send((json.dumps(comando) + "\n").encode())
-                print(f"[→] Enviado a {cliente.id}")
-            except Exception as e:
-                print(f"Error: {e}")
+            except:
+                pass

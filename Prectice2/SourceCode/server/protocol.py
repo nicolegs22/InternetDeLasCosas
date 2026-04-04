@@ -2,18 +2,12 @@ from datetime import datetime
 
 class Protocolo:
     @staticmethod
-    def comando_led(color, duracion):
-        colores = {
-            "rojo": [255, 0, 0],
-            "verde": [0, 255, 0],
-            "amarillo": [255, 255, 0]
-        }
-
+    def comando_led(rgb, duracion):
+        """Crea comando para controlar LEDs RGB"""
         return {
             "tipo": "comando",
             "comando": "leds",
-            "color": color,
-            "rgb": colores.get(color, [255,255,255]),
+            "rgb": rgb,  # Lista de 3 enteros [R, G, B]
             "duracion": duracion,
             "timestamp": datetime.now().isoformat()
         }
