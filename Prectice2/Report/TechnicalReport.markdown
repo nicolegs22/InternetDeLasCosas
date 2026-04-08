@@ -1,223 +1,237 @@
-Practica 2
-Integrantes:
-    -Gabriel Herrera
-    -Nicole Gomez
-    -Fernando Rodriguez
+Práctica 2 – Sistema IoT con Sensor y Actuador
+Integrantes
+Gabriel Herrera
+Nicole Gomez
+Fernando Rodriguez
 
-1.Requerimiento Funcionales 
-    Los circuitos y códigos hechos requieren principalmente de la presencia de una red WiFi la cual permita conectar los tres dispositivos y enviar por medio de esta todos los datos de uno al otro, estos por medio de una comunicación TCP, la cual permite enviar y recibir datos de una entidad a otra.
+1. Requerimientos Funcionales
 
-    En este caso los tres elementos de la practica son:
-        •	Actuador
+El sistema desarrollado requiere una red WiFi que permita la conexión entre tres componentes principales mediante comunicación TCP, lo que posibilita el envío y recepción de datos entre ellos.
+
+Los elementos del sistema son:
+
+        •   Actuador
         •	Sensor
         •	Servidor
-    Este depende del protocolo integrado en el servido para mantener conexión, y además recibir ordenes de apagado y encendido, estas son las únicas señales de las que el actuador depende
 
-    El sensor en su caso manda señales a su vez al servidor para estar activo, y luego identificar la longitud del objeto, este mandando señales del sensor ultrasónico al servidor para que este ultimo calcule la distancia final a usar.
+El sensor ultrasónico mide la distancia de un objeto y envía estos datos al servidor.
 
-    El servidor recibe y envía señales a tanto el sensor como el actuador, este obteniendo el tiempo de viaje de las ondas ultrasónicas para procesarlas y de esa manera calcular la distancia de los objetos. Por otro lado, envía un por medio de un mensaje codificado al actuador que led debe encender y cuales apagar, esto aclarado en los requerimientos no funcionales.
-2.Requerimientos No Funcionales
-    En cuanto al funcionamiento del proyecto este se divide en los siguientes puntos según los elementos del trabajo mismo:
-    El actuador recibe datos del servidor para activar sus luces led, o apagarlas dependiendo del caso, siendo que se activan en los siguientes         
+El servidor recibe la información, la procesa y determina qué acción ejecutar en función de la distancia medida.
+
+El actuador recibe comandos desde el servidor para encender o apagar un LED RGB según el rango de distancia.
+
+El flujo de funcionamiento es el siguiente:
+
+• El sensor mide la distancia.
+• Envía los datos al servidor.
+• El servidor procesa la información.
+• El servidor envía un comando al actuador.
+• El actuador ejecuta la acción (encender LED con un color específico).
+
+
+3. Requerimientos No Funcionales
+    El comportamiento del sistema se define mediante rangos de distancia que determinan el color del LED:       
         rangos:
             Rango	        Color
              0 a 10	        Rojo
              10 a 20	    Azul
              20 a 30	    Verde
-            Cualquier otro	Ninguno
+             otros           Apagado
 
-    Este esta esperando en todo momento una orden del servidor y se mantendrá en el mismo estado hasta que una nueva orden se reciba del servidor. El actuador no tiene mas rangos debido a la característica demostrativa del proyecto y por ello se debe mantener su simplicidad de respuesta de datos, mientras que su fiabilidad se basa principalmente en la actualización del servidor, que esta puesta en cada 2 segundos para evitar overflow de datos.
+   Características adicionales:
 
-    El Sensor en este caso manda los datos a la misma velocidad para de esa manera tampoco generar un overflow de estos en el servidor, con ello se deben también establecer que, si estabilidad se basa en la estructura, aunque simple, fiable del sensor ultrasónico.
+El actuador mantiene el estado hasta recibir un nuevo comando.
+El sensor envía datos cada 1 segundo para evitar saturación.
+El sistema utiliza comunicación TCP confiable.
+La estabilidad depende de:
+Calidad de la red WiFi
+Precisión del sensor ultrasónico
+Capacidad del hardware
 
-    El servidor está limitado de manera que este no reciba datos a menos a que estén en un puerto especifico y que el mensaje entregado este dentro de los parámetros de lectura del mismo servidor, estos no tendrán un limite de funcionamiento, pero se verán afectados si es que el hardware no es mantenido, lo cual no es el caso debido a la aptitud demostrativa del trabajo.
-3. Documentación del Código
-    Clase: ServidorIoT (Python)
-        Servidor TCP que gestiona la comunicación entre sensores y actuadores.
-            Atributos:
-                host: Dirección IP donde escucha el servidor (0.0.0.0 para todas las interfaces)
-                puerto: Puerto de comunicación (5000)
-                server: Socket TCP del servidor
-                gestor: Instancia de GestorClientes para manejar los clientes conectados
+3. Arquitectura del Sistema
 
-            Métodos:
-                -iniciar(): Inicia el servidor, acepta conexiones y crea un hilo por cada cliente.
-                    Proceso: Vincula el socket al host y puerto, comienza a escuchar y acepta conexiones entrantes. Por cada cliente, crea un hilo independiente para manejar su comunicación.
+El sistema sigue una arquitectura cliente-servidor:
 
-                -manejar_cliente(): Gestiona la comunicación con un cliente específico.
-                    Proceso: Recibe datos del cliente, los acumula en un buffer y procesa mensajes completos separados por saltos de línea.
+• Sensor → Cliente que envía datos
+• Actuador → Cliente que recibe comandos
+• Servidor → Nodo central que procesa lógica
 
-                -procesar_mensaje(): Analiza y procesa cada mensaje JSON recibido.
-                    Proceso:
-                    -Si es "registro": Registra el cliente en el gestor.
-                    -Si es "sensor_data": Extrae la distancia, evalúa el rango, crea un comando RGB y lo envía a los actuadores.
-                    -Si es "comando_respuesta": Confirma la ejecución del actuador.
+4. Documentación del Código
+Servidor (Python)
+Clase: ServidorIoT
 
-                enviar_a_actuadores(): Envía un comando a todos los actuadores conectados.
+Gestiona la comunicación entre dispositivos.
 
-    Clase: GestorClientes (Python)
-        Administra el registro y seguimiento de los clientes conectados.
+Funciones principales:
 
-        Atributos:
-            clientes: Diccionario que almacena los clientes usando su ID como clave.
+• iniciar():
+  Inicia el servidor y acepta conexiones.
+• manejar_cliente():
+  Recibe datos y los separa por mensajes.
+• procesar_mensaje():
+    • Registra dispositivos
+    • Procesa datos del sensor
+    • Determina color según distancia
+• enviar_a_actuadores():
+Envía comandos a todos los actuadores.
 
-        Métodos:
-            registrar(): Añade un nuevo cliente al gestor.
-                Proceso: Crea un objeto Cliente con ID, socket, dirección y tipo, y lo almacena en el diccionario.
+Clase: GestorClientes
+Administra clientes conectados.
 
-            eliminar(): Remueve un cliente del gestor cuando se desconecta.
-                Proceso: Busca el cliente por su socket y lo elimina del diccionario.
+   • Registra dispositivos
+   • Elimina desconectados
+   • Filtra actuadores
+   • Clase: Protocolo
 
-            obtener_actuadores(): Retorna una lista de todos los clientes de tipo "actuador".
+Define formato de mensajes JSON:
 
-    Clase: Protocolo (Python)
-        Define la estructura de los mensajes del sistema.
+{
+  "tipo": "comando",
+  "comando": "leds",
+  "rgb": [255, 0, 0],
+  "duracion": 1000
+}
 
-        Métodos estáticos:
-            comando_led(rgb, duracion): Crea un comando para controlar el LED RGB.
-                Proceso: Construye un diccionario con tipo "comando", comando "leds", valores RGB, duración y timestamp.
+5. Dispositivos ESP32
+Sensor
 
-        Formato del mensaje:
-            {
-                "tipo": "comando",
-                "comando": "leds",
-                "rgb": [255, 0, 0],
-                "duracion": 1000,
-                "timestamp": "2024-01-01T12:00:00"
-            }
+Funciones:
 
-    Clase: Sensor (ESP32 - C++)
-        Gestiona el sensor ultrasónico y envía mediciones al servidor.
+Mide distancia con ultrasonido
+Envía datos al servidor
 
-        Atributos:
-            ssid, password: Credenciales de la red WiFi
-            serverIP, serverPort: Dirección del servidor
-            trigPin, echoPin: Pines conectados al sensor ultrasónico
-            client: Cliente WiFi para comunicación TCP
+Fórmula utilizada:
+        distancia = duracion x 0.034/2
+Actuador
 
-        Métodos:
-            iniciar(): Configura el sistema y establece conexiones.
-                Proceso: Inicializa Serial, configura pines del sensor, conecta a WiFi y se registra en el servidor.
+Funciones:
 
-            loop(): Ejecución principal del sensor.
-                Proceso: Verifica la conexión con el servidor, mide la distancia, envía los datos en formato JSON y espera 1 segundo.
+Recibe comandos JSON
+Controla LED RGB
+Envía confirmación al servidor
 
-            medirDistancia(): Realiza la medición ultrasónica.
-                Proceso:
-                    - Envía un pulso de 10μs por el pin trigPin
-                    - Mide la duración del pulso de retorno con pulseIn()
-                    - Calcula distancia = duración * 0.034 / 2
+6. Resultados
+El sistema funcionó correctamente, logrando una comunicación efectiva entre los dispositivos.
+Pruebas realizadas
+Prueba	     Distancia	      Resultado
+1	         5 cm              	Rojo 
+2	         15 cm             	Azul 
+3	         25 cm	            Verde 
+4	         40 cm          	Apagado 
 
-            conectarWiFi(): Conecta a la red WiFi.
-            conectarServidor(): Establece conexión TCP y se registra.
-
-    Clase: Actuator (ESP32 - C++)
-        Controla el LED RGB según comandos recibidos del servidor.
-
-        Atributos:
-            ssid, password: Credenciales WiFi
-            serverIP, serverPort: Dirección del servidor
-            pinR, pinG, pinB: Pines del LED RGB
-            client: Cliente WiFi
-
-        Métodos:
-            iniciar(): Configura pines y establece conexiones.
-                Proceso: Inicializa Serial, configura pines como salida PWM, conecta a WiFi y se registra.
-
-            loop(): Escucha comandos del servidor.
-                Proceso: Verifica conexión, procesa mensajes entrantes.
-
-            procesarComando(): Ejecuta comandos recibidos.
-                Proceso:
-                    - Parsea el JSON del comando
-                    - Extrae valores RGB y duración
-                    - Aplica PWM a los pines con analogWrite()
-                    - Espera la duración especificada
-                    - Apaga el LED
-                    - Envía confirmación al servidor
-
-            enviarConfirmacion(): Notifica al servidor que el comando se ejecutó.
-
-    Archivo main.py
-        Punto de entrada del servidor.
-
-        Proceso:
-            - Crea una instancia de ServidorIoT
-            - Inicia el servidor
-            - Maneja la interrupción de teclado (Ctrl+C) para cerrar gracefulmente
-
-    Archivo main.cpp (Sensor)
-        Punto de entrada del ESP32 sensor.
-
-        Objetos:
-            sensor: Instancia de la clase Sensor con configuración WiFi, IP del servidor (192.168.0.13:5000), trig=5, echo=18.
-
-        Funciones:
-            setup(): Llama a sensor.iniciar()
-            loop(): Llama a sensor.loop() repetidamente
-
-    Archivo main.cpp (Actuador)
-        Punto de entrada del ESP32 actuador.
-
-        Objetos:
-            actuator: Instancia con pines RGB en 13, 12, 14
-
-        Funciones:
-            setup(): Llama a actuator.iniciar()
-            loop(): Llama a actuator.loop() repetidamente
+Salida del servidor
+Servidor IoT iniciado en 0.0.0.0:5000
+[+] Registrado ESP32_ACTUADOR_01 (actuador)
+[+] Registrado ESP32_SENSOR_01 (sensor)
+ROJO     |   5.2 cm
+AZUL     |  15.8 cm
+VERDE    |  24.3 cm
+APAGADO  |  42.1 cm
 
 
 
-5. Resultados
-    Los resultados obtenidos durante la implementación demostraron que el sistema cliente-servidor funciona correctamente. El sensor ultrasónico logra medir distancias con precisión y enviar los datos al servidor a través de WiFi. El servidor procesa las mediciones y envía comandos al actuador, que controla el LED RGB según el rango de distancia programado.
+7. Pruebas del Sistema
 
-    Pruebas realizadas:
+Se realizaron diferentes pruebas para evaluar el comportamiento del sistema IoT en condiciones reales de funcionamiento. Estas pruebas se enfocaron en tres aspectos principales: integridad de los mensajes, velocidad de transmisión y estabilidad en uso prolongado.
 
-    Prueba    Distancia (cm)    Color Esperado    Resultado
-    1         5                 ROJO              ✅ Correcto
-    2         15                AZUL              ✅ Correcto
-    3         25                VERDE             ✅ Correcto
-    4         40                APAGADO           ✅ Correcto
-    5         8                 ROJO              ✅ Correcto
-    6         18                AZUL              ✅ Correcto
+7.1 Integridad de los mensajes enviados
 
-    Salida del servidor durante pruebas:
+Esta prueba tuvo como objetivo verificar que los datos enviados entre el sensor, el servidor y el actuador no presenten pérdidas ni alteraciones, incluso en un entorno con múltiples redes WiFi.
 
-    Servidor IoT iniciado en 0.0.0.0:5000
-    --------------------------------------------------
-    [+] Registrado ESP32_ACTUADOR_01 (actuador)
-    [+] Registrado ESP32_SENSOR_01 (sensor)
-    ROJO     |   5.2 cm
-    AZUL     |  15.8 cm
-    VERDE    |  24.3 cm
-    APAGADO  |  42.1 cm
+Metodología:
 
-    Anomalías detectadas:
-        - El sensor ultrasónico tiene un rango mínimo de 2-4 cm, por debajo del cual las mediciones son inestables.
-        - Superficies no planas o angulosas afectan la reflexión del ultrasonido, generando lecturas erróneas.
-        - La conexión WiFi puede interrumpirse si hay interferencia, requiriendo reconexión automática.
-        - La latencia de red puede causar pequeños retrasos entre la medición y la activación del LED.
+Se ejecutó el sistema en un entorno urbano con alta interferencia inalámbrica.
+Se utilizó una herramienta de análisis de red (Wireshark) para observar los paquetes transmitidos.
+Se monitorearon los mensajes enviados y recibidos entre dispositivos.
 
-6. Conclusiones
-    El desarrollo del sistema permitió implementar una arquitectura cliente-servidor completa para la practica, donde dos dispositivos ESP32 se comunican con un servidor central en Python. 
+Resultados:
 
-    Logros principales:
-        - Comunicación bidireccional entre sensor, servidor y actuador.
-        - Procesamiento concurrente de múltiples clientes mediante hilos.
-        - Código modular y orientado a objetos en ambos lenguajes (Python y C++).
-        - Control de LED basado en rangos de distancia.
+No se detectaron pérdidas de paquetes.
+Los mensajes JSON llegaron completos y sin alteraciones.
+No se observaron errores de comunicación.
 
-    El sistema cumple con el objetivo de medir distancia y representarla visualmente mediante colores.
+Conclusión:
+El uso del protocolo TCP garantiza la integridad de los datos, asegurando que los mensajes enviados sean recibidos correctamente.
 
-7. Recomendaciones
+7.2 Velocidad de envío de paquetes
 
-    Se recomienda realizar varias pruebas del sensor y tomar más de una medición antes de usar el valor final, ya que en algunos momentos las lecturas pueden variar un poco. También es importante verificar constantemente la conexión del ESP32, asegurándose de que pueda reconectarse si el WiFi o el servidor fallan durante las pruebas.
+Esta prueba evaluó el tiempo que tarda un mensaje en ser enviado desde el sensor hasta el servidor y procesado para generar una respuesta.
 
-    Durante el desarrollo, es útil observar los datos en tiempo real (por ejemplo en el monitor serial) para detectar errores o comportamientos inesperados. Además, se podría considerar hacer una pequeña interfaz o visualización simple para entender mejor cómo está funcionando el sistema mientras se ejecuta.
+Datos obtenidos:
 
-    Por otro lado, al trabajar con el actuador, es recomendable evitar pausas largas que detengan el programa, ya que esto puede impedir que responda rápidamente a nuevos comandos. Finalmente, sería conveniente permitir ajustar fácilmente los rangos de distancia y el comportamiento de los LEDs sin tener que modificar todo el código, facilitando así futuras pruebas y mejoras del sistema.
+N	Diferencia (s)
+1	0.79
+2	0.60
+3	0.66
+4	0.77
+5	0.80
+6	0.81
+7	0.81
+8	0.82
+9	0.91
+10	0.85
 
-8. Anexos
+Cálculo del promedio:
+
+𝑥ˉ= 0.782
+
+Cálculo del error promedio:
+
+𝐸𝑟𝑟𝑜𝑟 ≈ 0.084
+
+Resultados:
+
+Latencia promedio baja (~0.78 s)
+Variación pequeña entre mediciones
+
+Conclusión:
+El sistema presenta un tiempo de respuesta adecuado para aplicaciones IoT básicas, sin retrasos perceptibles a nivel humano.
+
+7.3. Error debido al uso prolongado
+
+Esta prueba evaluó el comportamiento del sistema durante ejecuciones prolongadas.
+
+Metodología:
+
+Se ejecutó el sistema continuamente durante varios minutos.
+Se monitoreó el comportamiento del sensor, servidor y actuador.
+
+Resultados:
+
+Funcionamiento estable durante los primeros 10–11 minutos.
+Posteriormente se observaron:
+Errores de transmisión
+Posible pérdida de conexión
+Disminución en el rendimiento
+
+Causas identificadas:
+
+Saturación de memoria en el ESP32
+Uso continuo del módulo WiFi
+Falta de liberación de recursos
+
+Conclusión:
+El sistema no está optimizado para ejecución prolongada sin pausas. Se recomienda implementar mecanismos de gestión de memoria y reconexión automática.
+
+8. Conclusiones
+
+El sistema cumple correctamente su objetivo:
+
+• Comunicación estable entre dispositivos
+• Procesamiento en tiempo real
+• Respuesta correcta del actuador
+Conclusiones cuantitativas
+•  Baja latencia
+•  Error mínimo
+• Alta confiabilidad en red local
+
+9. Recomendaciones
+• Implementar reconexión automática
+•  Evitar uso continuo prolongado
+•  Promediar mediciones del sensor
+•  Optimizar uso de memoria
+
+10. Anexos
     Estructura de archivos del proyecto:
 
     SourceCode/
